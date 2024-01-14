@@ -102,7 +102,7 @@ OpenGLなんかチンプンカンプンで、その上Javaのコードに触れ�
 * 死亡(die.vmd)
 * 任意のタイミングで再生機能なモーション4つ(custom_[1-4].vmd)
 * 特定のアイテムを特定の腕で使ったときのモーション  
-(itemActive_[itemName]\_[Left or Right]_[using or swinging].vmd)
+  (itemActive_[itemName]\_[Left or Right]_[using or swinging].vmd)
 * 乗馬中の移動(onHorse.vmd)
 * 匍匐前進(crawl.vmd)
 * 伏せ(lieDown.vmd)
@@ -118,11 +118,12 @@ OpenGLなんかチンプンカンプンで、その上Javaのコードに触れ�
 ## その他
 
 * model.propertiesでモデルのサイズと持っているアイテムの角度を変更できます。  
-書き方はReleaseに置いてあるファイルやソースコードを参考にしてください。  
+  書き方はReleaseに置いてあるファイルやソースコードを参考にしてください。
 * lightMap.pngを編集するとモデルに当たる環境光やアイテム由来の光の色が変更できます。  
-(シェーダー使用中はシェーダーの方が優先されます。)
-* [requiredFiles](https://github.com/Gengorou-C/KAIMyEntity-C/releases/tag/requiredFiles)にあるKAIMyEntity.zipに入っているファイルに関してはご自由にお使いください。  
-(クレジット表記不要、改変可、再配布可)
+  (シェーダー使用中はシェーダーの方が優先されます。)
+* [requiredFiles](https://github.com/Gengorou-C/KAIMyEntity-C/releases/tag/requiredFiles)
+  にあるKAIMyEntity.zipに入っているファイルに関してはご自由にお使いください。  
+  (クレジット表記不要、改変可、再配布可)
 
 ### やりたいこと(達成時期どころか、可能かどうかすら不明のものを含む)
 

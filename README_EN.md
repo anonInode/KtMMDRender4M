@@ -1,7 +1,7 @@
 # KAIMyEntity-C
 
-KAIMyEntity allows you to render 3D models of MikuMikuDance instead of default entities.  
-  
+KAIMyEntity allows you to render 3D models of MikuMikuDance instead of default entities.
+
 I'm not professional programer.  
 I can't support and guarantee that this mod work without any bugs.
 
@@ -34,7 +34,7 @@ I can't support and guarantee that this mod work without any bugs.
 (4) If KAIMyEntitySaba.dll does't exist in Game directory, it will be downloaded.  
 (5) Open KAIMyEntity folder, and copy and paste EntityPlayer folder.  
 (6) Rename the copied EntityPlayer folder "EntityPlayer_(YourName)".  
- (e.g.) "EntityPlayer_Gengorou-C"  
+(e.g.) "EntityPlayer_Gengorou-C"  
 (7) Put 3D model files in EntityPlayer_(YourName) folder.  
 (8) Rename the 3D model file "model.pmx" (or "model.pmd").  
 (9) Select world, and start the game.
@@ -96,8 +96,8 @@ I can't support and guarantee that this mod work without any bugs.
 * die.vmd
 * custom_[1-4].vmd
 * itemActive_[itemName]\_[Left or Right]_[using or swinging].vmd  
-(e.g. itemActive_minecraft.shield_Left_using.vmd)  
-(dedicated motion for each items)
+  (e.g. itemActive_minecraft.shield_Left_using.vmd)  
+  (dedicated motion for each items)
 * onHorse.vmd
 * crawl.vmd
 * lieDown.vmd
