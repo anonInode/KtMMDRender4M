@@ -8,10 +8,6 @@ import java.net.URL
 import java.nio.ByteBuffer
 import java.util.*
 
-private enum class ExternalLib {
-    windows, android_arch64, android_arch64_libc
-}
-
 private val RuntimePath: String = File(System.getProperty("java.home")).parent
 private val gameDirectory: String = MinecraftClient.getInstance().runDirectory.absolutePath
 private val isAndroid = File("/system/build.prop").exists()
@@ -24,18 +20,13 @@ private const val ANDROID_SO =
     "https://github.com.cnpmjs.org/asuka-mio/KAIMyEntitySaba/releases/download/crossplatform/KAIMyEntitySaba.so"
 private const val ANDROID_LIBCXX =
     "https://github.com.cnpmjs.org/asuka-mio/KAIMyEntitySaba/releases/download/crossplatform/libc++_shared.so"
-private val urlMap = buildMap {
-    put(ExternalLib.windows, WIN_DLL)
-    put(ExternalLib.android_arch64, ANDROID_SO)
-    put(ExternalLib.android_arch64_libc, ANDROID_LIBCXX)
-}
 
 private fun download(url: URL, file: File) {
     if (file.exists()) {
-        try {
+        runCatching {
             System.load(file.absolutePath)
-            return  //File exist and loadable
-        } catch (e: Error) {
+            return
+        }.onFailure {
             KAIMyEntityClient.logger.info("\"" + file.absolutePath + "\" broken! Trying recover it!")
         }
     }
@@ -54,34 +45,34 @@ private fun download(url: URL, file: File) {
     }
 }
 
-object NativeFunc {
-    private fun LoadLibrary(file: File) {
-        try {
-            System.load(file.absolutePath)
-        } catch (e: Error) {
-            KAIMyEntityClient.logger.info("Runtime \"" + file.absolutePath + "\" not found!")
-            throw e
-        }
+private fun load(file: File) {
+    try {
+        System.load(file.absolutePath)
+    } catch (e: Error) {
+        KAIMyEntityClient.logger.info("Runtime \"" + file.absolutePath + "\" not found!")
+        throw e
     }
+}
 
+object NativeFunc {
     init {
         when {
             isWindows -> runCatching {
                 KAIMyEntityClient.logger.info("Win32 Env Detected!")
-                LoadLibrary(File(gameDirectory, "KAIMyEntitySaba.dll"))
+                load(File(gameDirectory, "KAIMyEntitySaba.dll"))
             }.onFailure {
                 download(URL(WIN_DLL), File(gameDirectory, "KAIMyEntitySaba.dll"))
             }
 
             isLinux && !isAndroid -> {
                 KAIMyEntityClient.logger.info("Linux Env Detected!")
-                LoadLibrary(File(gameDirectory, "KAIMyEntitySaba.so"))
+                load(File(gameDirectory, "KAIMyEntitySaba.so"))
             }
 
             isLinux && isAndroid -> runCatching {
                 KAIMyEntityClient.logger.info("Android Env Detected!")
-                LoadLibrary(File(RuntimePath, "libc++_shared.so"))
-                LoadLibrary(File(RuntimePath, "KAIMyEntitySaba.so"))
+                load(File(RuntimePath, "libc++_shared.so"))
+                load(File(RuntimePath, "KAIMyEntitySaba.so"))
             }.onFailure {
                 download(URL(ANDROID_LIBCXX), File(RuntimePath, "libc++_shared.so"))
                 download(URL(ANDROID_SO), File(RuntimePath, "KAIMyEntitySaba.so"))
