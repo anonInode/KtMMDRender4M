@@ -1,27 +1,26 @@
 package com.kAIS.KAIMyEntity.network;
 
-import java.util.UUID;
-
 import com.kAIS.KAIMyEntity.register.KAIMyEntityRegisterCommon;
 import com.kAIS.KAIMyEntity.renderer.KAIMyEntityRendererPlayerHelper;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
-
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 
+import java.util.UUID;
+
 public class KAIMyEntityNetworkPack {
-    public static void sendToServer(int opCode, UUID playerUUID, int arg0){
+    public static void sendToServer(int opCode, UUID playerUUID, int arg0) {
         PacketByteBuf buffer = PacketByteBufs.create();
         buffer.writeInt(opCode);
         buffer.writeUuid(playerUUID);
         buffer.writeInt(arg0);
         ClientPlayNetworking.send(KAIMyEntityRegisterCommon.KAIMYENTITY_C2S, buffer);
     }
-    
-    public static void DoInClient(PacketByteBuf buffer){
+
+    public static void DoInClient(PacketByteBuf buffer) {
         DoInClient(buffer.readInt(), buffer.readUuid(), buffer.readInt());
     }
 

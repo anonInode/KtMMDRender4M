@@ -17,7 +17,6 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityType;
 import net.minecraft.text.Text;
-
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
@@ -66,9 +65,9 @@ public class KAIMyEntityRegisterClient {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyChangeProgram.wasPressed()) {
                 KAIMyEntityClient.usingMMDShader = 1 - KAIMyEntityClient.usingMMDShader;
-                if(KAIMyEntityClient.usingMMDShader == 0)
+                if (KAIMyEntityClient.usingMMDShader == 0)
                     MCinstance.inGameHud.getChatHud().addMessage(Text.of("Default shader"));
-                if(KAIMyEntityClient.usingMMDShader == 1)
+                if (KAIMyEntityClient.usingMMDShader == 1)
                     MCinstance.inGameHud.getChatHud().addMessage(Text.of("MMDShader"));
             }
         });
@@ -94,7 +93,7 @@ public class KAIMyEntityRegisterClient {
                 KAIMyEntityNetworkPack.DoInClient(opCode, playerUUID, arg0);
             });
         });
-        
+
         KAIMyEntityClient.logger.info("KAIMyEntityRegisterClient.Register() finished");
     }
 

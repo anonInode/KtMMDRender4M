@@ -58,7 +58,7 @@ public class MMDModelManager {
         return model;
     }
 
-    public static Model GetModel(String modelName){
+    public static Model GetModel(String modelName) {
         return GetModel(modelName, "");
     }
 
@@ -101,7 +101,7 @@ public class MMDModelManager {
         public Properties properties = new Properties();
         boolean isPropertiesLoaded = false;
 
-        public void loadModelProperties(boolean forceReload){
+        public void loadModelProperties(boolean forceReload) {
             if (isPropertiesLoaded && !forceReload)
                 return;
             String path2Properties = gameDirectory + "/KAIMyEntity/" + modelName + "/model.properties";
@@ -109,11 +109,11 @@ public class MMDModelManager {
                 InputStream istream = new FileInputStream(path2Properties);
                 properties.load(istream);
             } catch (IOException e) {
-                KAIMyEntityClient.logger.warn( "KAIMyEntity/" + modelName + "/model.properties not found" );
+                KAIMyEntityClient.logger.warn("KAIMyEntity/" + modelName + "/model.properties not found");
             }
             isPropertiesLoaded = true;
             KAIMyEntityClient.reloadProperties = false;
-        } 
+        }
     }
 
     public static class ModelWithEntityData extends Model {

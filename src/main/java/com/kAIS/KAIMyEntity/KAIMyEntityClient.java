@@ -5,26 +5,19 @@ import com.kAIS.KAIMyEntity.renderer.MMDAnimManager;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
 import com.kAIS.KAIMyEntity.renderer.MMDTextureManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
+
+import java.io.*;
+import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class KAIMyEntityClient implements ClientModInitializer {
     public static final Logger logger = LogManager.getLogger();
@@ -71,17 +64,17 @@ public class KAIMyEntityClient implements ClientModInitializer {
             while ((entry = zis.getNextEntry()) != null) {
                 logger.info("Extracting: " + entry);
                 int count;
-                byte data[] = new byte[BUFFER];
+                byte[] data = new byte[BUFFER];
                 // Write the files to the disk, but ensure that the filename is valid,
                 // and that the file is not insanely big
-                String name = validateFilename(targetDir+entry.getName(), ".");
+                String name = validateFilename(targetDir + entry.getName(), ".");
                 File targetFile = new File(name);
                 if (entry.isDirectory()) {
                     logger.info("Creating directory " + name);
                     new File(name).mkdir();
                     continue;
                 }
-                if (!targetFile.getParentFile().exists()){
+                if (!targetFile.getParentFile().exists()) {
                     targetFile.getParentFile().mkdirs();
                 }
                 FileOutputStream fos = new FileOutputStream(name);
@@ -106,27 +99,26 @@ public class KAIMyEntityClient implements ClientModInitializer {
         }
     }
 
-    private void checkKAIMyEntityFolder(){
+    private void checkKAIMyEntityFolder() {
         File KAIMyEntityFolder = new File(gameDirectory + "/KAIMyEntity");
-        if (!KAIMyEntityFolder.exists()){
+        if (!KAIMyEntityFolder.exists()) {
             logger.info("KAIMyEntity folder not found, try download from github!");
             KAIMyEntityFolder.mkdir();
-            try{
+            try {
                 FileUtils.copyURLToFile(new URL("https://github.com/Gengorou-C/KAIMyEntity-C/releases/download/requiredFiles/KAIMyEntity.zip"), new File(gameDirectory + "/KAIMyEntity.zip"), 30000, 30000);
-            }catch (IOException e){
+            } catch (IOException e) {
                 logger.info("Download KAIMyEntity.zip failed!");
             }
 
-            try{
+            try {
                 unzip(gameDirectory + "/KAIMyEntity.zip", gameDirectory + "/KAIMyEntity/");
-            }catch (IOException e){
+            } catch (IOException e) {
                 logger.info("extract KAIMyEntity.zip failed!");
             }
         }
-        return;
     }
 
-    public static String calledFrom(int i){
+    public static String calledFrom(int i) {
         StackTraceElement[] steArray = Thread.currentThread().getStackTrace();
         if (steArray.length <= i) {
             return "";
@@ -134,10 +126,10 @@ public class KAIMyEntityClient implements ClientModInitializer {
         return steArray[i].getClassName();
     }
 
-    public static Vector3f str2Vec3f(String arg){
+    public static Vector3f str2Vec3f(String arg) {
         Vector3f vector3f = new Vector3f();
         String[] splittedStr = arg.split(",");
-        if (splittedStr.length != 3){
+        if (splittedStr.length != 3) {
             return new Vector3f(0.0f);
         }
         vector3f.x = Float.valueOf(splittedStr[0]);
@@ -145,8 +137,8 @@ public class KAIMyEntityClient implements ClientModInitializer {
         vector3f.z = Float.valueOf(splittedStr[2]);
         return vector3f;
     }
-    
-    public static void drawText(String arg, int x, int y){
+
+    public static void drawText(String arg, int x, int y) {
         MinecraftClient MCinstance = MinecraftClient.getInstance();
         MatrixStack mat;
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);

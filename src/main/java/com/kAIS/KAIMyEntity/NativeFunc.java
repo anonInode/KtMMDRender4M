@@ -202,6 +202,6 @@ public class NativeFunc {
     public native void DeleteAnimation(long anim);
 
     enum runtimeUrlRes {
-        windows,android_arch64, android_arch64_libc
+        windows, android_arch64, android_arch64_libc
     }
 }

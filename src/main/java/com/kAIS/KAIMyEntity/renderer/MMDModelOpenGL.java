@@ -4,15 +4,14 @@ import com.kAIS.KAIMyEntity.KAIMyEntityClient;
 import com.kAIS.KAIMyEntity.NativeFunc;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.LightType;
-
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL46C;
@@ -24,7 +23,6 @@ import java.nio.FloatBuffer;
 
 public class MMDModelOpenGL implements IMMDModel {
     static NativeFunc nf;
-    static boolean isShaderInited = false;
     static int MMDShaderProgram;
     int shaderProgram;
 
@@ -73,16 +71,7 @@ public class MMDModelOpenGL implements IMMDModel {
 
     }
 
-    public static void InitShader() {
-        //Init Shader
-        ShaderProvider.Init();
-        MMDShaderProgram = ShaderProvider.getProgram();
-        isShaderInited = true;
-    }
-
     public static MMDModelOpenGL Create(String modelFilename, String modelDir, boolean isPMD, long layerCount) {
-        if (!isShaderInited)
-            InitShader();
         if (nf == null) nf = NativeFunc.GetInst();
         long model;
         if (isPMD)
@@ -155,12 +144,12 @@ public class MMDModelOpenGL implements IMMDModel {
         if (mgrTex != null) {
             lightMapMaterial.tex = mgrTex.tex;
             lightMapMaterial.hasAlpha = mgrTex.hasAlpha;
-        }else{
+        } else {
             lightMapMaterial.tex = GL46C.glGenTextures();
             GL46C.glBindTexture(GL46C.GL_TEXTURE_2D, lightMapMaterial.tex);
-            ByteBuffer texBuffer = ByteBuffer.allocateDirect(16*16*4);
+            ByteBuffer texBuffer = ByteBuffer.allocateDirect(16 * 16 * 4);
             texBuffer.order(ByteOrder.LITTLE_ENDIAN);
-            for(int i=0;i<16*16;i++){
+            for (int i = 0; i < 16 * 16; i++) {
                 texBuffer.put((byte) 255);
                 texBuffer.put((byte) 255);
                 texBuffer.put((byte) 255);
@@ -176,7 +165,7 @@ public class MMDModelOpenGL implements IMMDModel {
             lightMapMaterial.hasAlpha = true;
         }
 
-        for(int i=0; i<vertexCount; i++){
+        for (int i = 0; i < vertexCount; i++) {
             colorBuffer.putFloat(1.0f);
             colorBuffer.putFloat(1.0f);
             colorBuffer.putFloat(1.0f);
@@ -184,7 +173,7 @@ public class MMDModelOpenGL implements IMMDModel {
         }
         colorBuffer.flip();
 
-        for(int i=0; i<vertexCount; i++){
+        for (int i = 0; i < vertexCount; i++) {
             uv1Buffer.putInt(15);
             uv1Buffer.putInt(15);
         }
@@ -250,24 +239,24 @@ public class MMDModelOpenGL implements IMMDModel {
         light1Direction = new Vector3f(-1.0f, 0.75f, 0.0f);
         light0Direction.normalize();
         light1Direction.normalize();
-        light0Direction.rotate(new Quaternionf().rotateY(entityYaw*((float)Math.PI / 180F)));
-        light1Direction.rotate(new Quaternionf().rotateY(entityYaw*((float)Math.PI / 180F)));
+        light0Direction.rotate(new Quaternionf().rotateY(entityYaw * ((float) Math.PI / 180F)));
+        light1Direction.rotate(new Quaternionf().rotateY(entityYaw * ((float) Math.PI / 180F)));
 
-        deliverStack.multiply(new Quaternionf().rotateY(-entityYaw*((float)Math.PI / 180F)));
-        deliverStack.multiply(new Quaternionf().rotateX(entityPitch*((float)Math.PI / 180F)));
+        deliverStack.multiply(new Quaternionf().rotateY(-entityYaw * ((float) Math.PI / 180F)));
+        deliverStack.multiply(new Quaternionf().rotateX(entityPitch * ((float) Math.PI / 180F)));
         deliverStack.translate(entityTrans.x, entityTrans.y, entityTrans.z);
         deliverStack.scale(0.09f, 0.09f, 0.09f);
-        
-        if(KAIMyEntityClient.usingMMDShader == 0){
+
+        if (KAIMyEntityClient.usingMMDShader == 0) {
             shaderProgram = RenderSystem.getShader().getGlRef();
             setUniforms(RenderSystem.getShader(), deliverStack);
             RenderSystem.getShader().bind();
         }
-        if(KAIMyEntityClient.usingMMDShader == 1){
+        if (KAIMyEntityClient.usingMMDShader == 1) {
             shaderProgram = MMDShaderProgram;
             GlStateManager._glUseProgram(shaderProgram);
         }
-        
+
         updateLocation(shaderProgram);
 
         BufferRenderer.reset();
@@ -281,7 +270,7 @@ public class MMDModelOpenGL implements IMMDModel {
         int posAndNorSize = vertexCount * 12; //float * 3
         long posData = nf.GetPoss(model);
         nf.CopyDataToByteBuffer(posBuffer, posData, posAndNorSize);
-        if(positionLocation != -1){
+        if (positionLocation != -1) {
             GL46C.glEnableVertexAttribArray(positionLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, vertexBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, posBuffer, GL46C.GL_STATIC_DRAW);
@@ -291,7 +280,7 @@ public class MMDModelOpenGL implements IMMDModel {
         //Normal
         long normalData = nf.GetNormals(model);
         nf.CopyDataToByteBuffer(norBuffer, normalData, posAndNorSize);
-        if(normalLocation != -1){
+        if (normalLocation != -1) {
             GL46C.glEnableVertexAttribArray(normalLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, normalBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, norBuffer, GL46C.GL_STATIC_DRAW);
@@ -302,7 +291,7 @@ public class MMDModelOpenGL implements IMMDModel {
         int uv0Size = vertexCount * 8; //float * 2
         long uv0Data = nf.GetUVs(model);
         nf.CopyDataToByteBuffer(uv0Buffer, uv0Data, uv0Size);
-        if(uv0Location != -1){
+        if (uv0Location != -1) {
             GL46C.glEnableVertexAttribArray(uv0Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, texcoordBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv0Buffer, GL46C.GL_STATIC_DRAW);
@@ -311,15 +300,15 @@ public class MMDModelOpenGL implements IMMDModel {
 
         //UV2
         MCinstance.world.calculateAmbientDarkness();
-        int blockBrightness = 16 * entityIn.getWorld().getLightLevel(LightType.BLOCK, entityIn.getBlockPos().up((int)(entityIn.getEyeY()-entityIn.getBlockY())));
-        int skyBrightness = Math.round((15.0f-MCinstance.world.getAmbientDarkness()) * (entityIn.getWorld().getLightLevel(LightType.SKY, entityIn.getBlockPos().up((int)(entityIn.getEyeY()-entityIn.getBlockY())))/15.0f) * 16);
+        int blockBrightness = 16 * entityIn.getWorld().getLightLevel(LightType.BLOCK, entityIn.getBlockPos().up((int) (entityIn.getEyeY() - entityIn.getBlockY())));
+        int skyBrightness = Math.round((15.0f - MCinstance.world.getAmbientDarkness()) * (entityIn.getWorld().getLightLevel(LightType.SKY, entityIn.getBlockPos().up((int) (entityIn.getEyeY() - entityIn.getBlockY()))) / 15.0f) * 16);
         uv2Buffer.clear();
-        for(int i = 0; i < vertexCount; i++){
+        for (int i = 0; i < vertexCount; i++) {
             uv2Buffer.putInt(blockBrightness);
             uv2Buffer.putInt(skyBrightness);
         }
         uv2Buffer.flip();
-        if(uv2Location != -1){
+        if (uv2Location != -1) {
             GL46C.glEnableVertexAttribArray(uv2Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, uv2BufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv2Buffer, GL46C.GL_STATIC_DRAW);
@@ -328,7 +317,7 @@ public class MMDModelOpenGL implements IMMDModel {
 
         //UV1
         uv1Buffer.position(0);
-        if(uv1Location != -1){
+        if (uv1Location != -1) {
             GL46C.glEnableVertexAttribArray(uv1Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, uv1BufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv1Buffer, GL46C.GL_STATIC_DRAW);
@@ -336,7 +325,7 @@ public class MMDModelOpenGL implements IMMDModel {
         }
 
         //color
-        if(colorLocation != -1){
+        if (colorLocation != -1) {
             GL46C.glEnableVertexAttribArray(colorLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, colorBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, colorBuffer, GL46C.GL_STATIC_DRAW);
@@ -351,11 +340,11 @@ public class MMDModelOpenGL implements IMMDModel {
         RenderSystem.getProjectionMatrix().get(projMatBuff);
 
         //upload Uniforms(MMDShader)
-        if(KAIMyEntityClient.usingMMDShader == 1){
+        if (KAIMyEntityClient.usingMMDShader == 1) {
             RenderSystem.glUniformMatrix4(modelViewLocation, false, modelViewMatBuff);
             RenderSystem.glUniformMatrix4(projMatLocation, false, projMatBuff);
 
-            if(light0Location != -1){
+            if (light0Location != -1) {
                 FloatBuffer light0Buff = MemoryUtil.memAllocFloat(3);
                 light0Buff.put(light0Direction.x);
                 light0Buff.put(light0Direction.y);
@@ -363,7 +352,7 @@ public class MMDModelOpenGL implements IMMDModel {
                 light0Buff.position(0);
                 RenderSystem.glUniform3(light0Location, light0Buff);
             }
-            if(light1Location != -1){
+            if (light1Location != -1) {
                 FloatBuffer light1Buff = MemoryUtil.memAllocFloat(3);
                 light1Buff.put(light1Direction.x);
                 light1Buff.put(light1Direction.y);
@@ -371,15 +360,15 @@ public class MMDModelOpenGL implements IMMDModel {
                 light1Buff.position(0);
                 RenderSystem.glUniform3(light1Location, light1Buff);
             }
-            if(sampler0Location != -1){
+            if (sampler0Location != -1) {
                 GL46C.glUniform1i(sampler0Location, 0);
             }
-            if(sampler1Location != -1){
+            if (sampler1Location != -1) {
                 RenderSystem.activeTexture(GL46C.GL_TEXTURE1);
                 RenderSystem.bindTexture(lightMapMaterial.tex);
                 GL46C.glUniform1i(sampler1Location, 1);
             }
-            if(sampler2Location != -1){
+            if (sampler2Location != -1) {
                 RenderSystem.activeTexture(GL46C.GL_TEXTURE2);
                 RenderSystem.bindTexture(lightMapMaterial.tex);
                 GL46C.glUniform1i(sampler2Location, 2);
@@ -387,78 +376,78 @@ public class MMDModelOpenGL implements IMMDModel {
         }
 
         //custom attributes & custom uniforms
-        if(K_positionLocation != -1){
+        if (K_positionLocation != -1) {
             GL46C.glEnableVertexAttribArray(K_positionLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, vertexBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, posBuffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribPointer(K_positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0);
         }
-        if(K_normalLocation != -1){
+        if (K_normalLocation != -1) {
             GL46C.glEnableVertexAttribArray(K_normalLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, normalBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, norBuffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribPointer(K_normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0);
         }
-        if(K_uv0Location != -1){
+        if (K_uv0Location != -1) {
             GL46C.glEnableVertexAttribArray(K_uv0Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, texcoordBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv0Buffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribPointer(K_uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0);
         }
-        if(K_uv2Location != -1){
+        if (K_uv2Location != -1) {
             GL46C.glEnableVertexAttribArray(K_uv2Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, uv2BufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv2Buffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribIPointer(K_uv2Location, 2, GL46C.GL_INT, 0, 0);
         }
-        if(K_projMatLocation != -1){
+        if (K_projMatLocation != -1) {
             projMatBuff.position(0);
             RenderSystem.glUniformMatrix4(K_projMatLocation, false, projMatBuff);
         }
-        if(K_modelViewLocation != -1){
+        if (K_modelViewLocation != -1) {
             modelViewMatBuff.position(0);
             RenderSystem.glUniformMatrix4(K_modelViewLocation, false, modelViewMatBuff);
         }
-        if(K_sampler0Location != -1){
+        if (K_sampler0Location != -1) {
             GL46C.glUniform1i(K_sampler0Location, 0);
         }
-        if(K_sampler2Location != -1){
+        if (K_sampler2Location != -1) {
             RenderSystem.activeTexture(GL46C.GL_TEXTURE2);
             RenderSystem.bindTexture(lightMapMaterial.tex);
             GL46C.glUniform1i(K_sampler2Location, 2);
         }
-        if(KAIMyLocationV != -1)
+        if (KAIMyLocationV != -1)
             GL46C.glUniform1i(KAIMyLocationV, 1);
-        
-        if(KAIMyLocationF != -1)
+
+        if (KAIMyLocationF != -1)
             GL46C.glUniform1i(KAIMyLocationF, 1);
 
         //Iris
-        if(I_positionLocation != -1){
+        if (I_positionLocation != -1) {
             GL46C.glEnableVertexAttribArray(I_positionLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, vertexBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, posBuffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribPointer(I_positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0);
         }
-        if(I_normalLocation != -1){
+        if (I_normalLocation != -1) {
             GL46C.glEnableVertexAttribArray(I_normalLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, normalBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, norBuffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribPointer(I_normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0);
         }
-        if(I_uv0Location != -1){
+        if (I_uv0Location != -1) {
             GL46C.glEnableVertexAttribArray(I_uv0Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, texcoordBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv0Buffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribPointer(I_uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0);
         }
-        if(I_uv2Location != -1){
+        if (I_uv2Location != -1) {
             GL46C.glEnableVertexAttribArray(I_uv2Location);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, uv2BufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv2Buffer, GL46C.GL_STATIC_DRAW);
             GL46C.glVertexAttribIPointer(I_uv2Location, 2, GL46C.GL_INT, 0, 0);
         }
-        if(I_colorLocation != -1){
+        if (I_colorLocation != -1) {
             GL46C.glEnableVertexAttribArray(I_colorLocation);
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, colorBufferObject);
             GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, colorBuffer, GL46C.GL_STATIC_DRAW);
@@ -490,9 +479,9 @@ public class MMDModelOpenGL implements IMMDModel {
             GL46C.glDrawElements(GL46C.GL_TRIANGLES, count, indexType, startPos);
         }
 
-        if(KAIMyLocationV != -1)
+        if (KAIMyLocationV != -1)
             GL46C.glUniform1i(KAIMyLocationV, 0);
-        if(KAIMyLocationF != -1)
+        if (KAIMyLocationF != -1)
             GL46C.glUniform1i(KAIMyLocationF, 0);
 
         RenderSystem.getShader().unbind();
@@ -509,7 +498,7 @@ public class MMDModelOpenGL implements IMMDModel {
         }
     }
 
-    void updateLocation(int shaderProgram){
+    void updateLocation(int shaderProgram) {
         positionLocation = GlStateManager._glGetAttribLocation(shaderProgram, "Position");
         normalLocation = GlStateManager._glGetAttribLocation(shaderProgram, "Normal");
         uv0Location = GlStateManager._glGetAttribLocation(shaderProgram, "UV0");
@@ -542,48 +531,48 @@ public class MMDModelOpenGL implements IMMDModel {
         I_colorLocation = GlStateManager._glGetAttribLocation(shaderProgram, "iris_Color");
     }
 
-    public void setUniforms(ShaderProgram shader, MatrixStack deliverStack){
-        if(shader.modelViewMat != null)
+    public void setUniforms(ShaderProgram shader, MatrixStack deliverStack) {
+        if (shader.modelViewMat != null)
             shader.modelViewMat.set(deliverStack.peek().getPositionMatrix());
 
-        if(shader.projectionMat != null)
+        if (shader.projectionMat != null)
             shader.projectionMat.set(RenderSystem.getProjectionMatrix());
 
-        if(shader.viewRotationMat != null)
+        if (shader.viewRotationMat != null)
             shader.viewRotationMat.set(RenderSystem.getInverseViewRotationMatrix());
 
-        if(shader.colorModulator != null)
+        if (shader.colorModulator != null)
             shader.colorModulator.set(RenderSystem.getShaderColor());
 
-        if(shader.light0Direction != null)
+        if (shader.light0Direction != null)
             shader.light0Direction.set(light0Direction);
 
-        if(shader.light1Direction != null)
+        if (shader.light1Direction != null)
             shader.light1Direction.set(light1Direction);
 
-        if(shader.fogStart != null)
+        if (shader.fogStart != null)
             shader.fogStart.set(RenderSystem.getShaderFogStart());
 
-        if(shader.fogEnd != null)
+        if (shader.fogEnd != null)
             shader.fogEnd.set(RenderSystem.getShaderFogEnd());
 
-        if(shader.fogColor != null)
+        if (shader.fogColor != null)
             shader.fogColor.set(RenderSystem.getShaderFogColor());
 
-        if(shader.fogShape != null)
+        if (shader.fogShape != null)
             shader.fogShape.set(RenderSystem.getShaderFogShape().getId());
 
-        if (shader.textureMat != null) 
+        if (shader.textureMat != null)
             shader.textureMat.set(RenderSystem.getTextureMatrix());
 
-        if (shader.gameTime != null) 
+        if (shader.gameTime != null)
             shader.gameTime.set(RenderSystem.getShaderGameTime());
 
         if (shader.screenSize != null) {
             Window window = MinecraftClient.getInstance().getWindow();
-            shader.screenSize.set((float)window.getWidth(), (float)window.getHeight());
+            shader.screenSize.set((float) window.getWidth(), (float) window.getHeight());
         }
-        if (shader.lineWidth != null) 
+        if (shader.lineWidth != null)
             shader.lineWidth.set(RenderSystem.getShaderLineWidth());
 
         shader.addSampler("Sampler1", lightMapMaterial.tex);

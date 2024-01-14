@@ -18,8 +18,8 @@ public class KAIMyEntityRegisterCommon {
             packetbuf.writeUuid(buf.readUuid());
             packetbuf.writeInt(buf.readInt());
             server.execute(() -> {
-                for(ServerPlayerEntity serverPlayer : PlayerLookup.all(server)){
-                    if(!serverPlayer.equals(player)){
+                for (ServerPlayerEntity serverPlayer : PlayerLookup.all(server)) {
+                    if (!serverPlayer.equals(player)) {
                         ServerPlayNetworking.send(serverPlayer, KAIMyEntityRegisterCommon.KAIMYENTITY_S2C, packetbuf);
                     }
                 }
