@@ -33,7 +33,10 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22"
     implementation "kotlin.graphics:gln:0.5.32"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    include("kotlin.graphics:gln:0.5.32")
+    include("kotlin.graphics:glm:0.9.9.1-11")
+    include("kotlin.graphics:kool:0.9.80")
+    include("kotlin.graphics:gli:0.8.3.0-22")
 
     // Uncomment the following line to enable the deprecated Fabric API modules.
     // These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
