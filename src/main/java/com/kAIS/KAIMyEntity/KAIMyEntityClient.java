@@ -3,7 +3,6 @@ package com.kAIS.KAIMyEntity;
 import com.kAIS.KAIMyEntity.register.KAIMyEntityRegisterClient;
 import com.kAIS.KAIMyEntity.renderer.MMDAnimManager;
 import com.kAIS.KAIMyEntity.renderer.MMDModelManager;
-import com.kAIS.KAIMyEntity.renderer.MMDTextureManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
@@ -34,7 +33,6 @@ public class KAIMyEntityClient implements ClientModInitializer {
         logger.info("KAIMyEntity InitClient begin...");
         checkKAIMyEntityFolder();
         MMDModelManager.Init();
-        MMDTextureManager.Init();
         MMDAnimManager.Init();
         KAIMyEntityRegisterClient.Register();
         logger.info("KAIMyEntity InitClient successful.");

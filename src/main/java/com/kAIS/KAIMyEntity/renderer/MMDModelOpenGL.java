@@ -130,20 +130,20 @@ public class MMDModelOpenGL implements IMMDModel {
             mats[i] = new MMDModelOpenGL.Material();
             String texFilename = nf.GetMaterialTex(model, i);
             if (!texFilename.isEmpty()) {
-                MMDTextureManager.Texture mgrTex = MMDTextureManager.GetTexture(texFilename);
+                MMDTextureManager.Texture mgrTex = MMDTextureManager.INSTANCE.texture(texFilename);
                 if (mgrTex != null) {
-                    mats[i].tex = mgrTex.tex;
-                    mats[i].hasAlpha = mgrTex.hasAlpha;
+                    mats[i].tex = mgrTex.getTex();
+                    mats[i].hasAlpha = mgrTex.getHasAlpha();
                 }
             }
         }
 
         //lightMap
         MMDModelOpenGL.Material lightMapMaterial = new MMDModelOpenGL.Material();
-        MMDTextureManager.Texture mgrTex = MMDTextureManager.GetTexture(modelDir + "/lightMap.png");
+        MMDTextureManager.Texture mgrTex = MMDTextureManager.INSTANCE.texture(modelDir + "/lightMap.png");
         if (mgrTex != null) {
-            lightMapMaterial.tex = mgrTex.tex;
-            lightMapMaterial.hasAlpha = mgrTex.hasAlpha;
+            lightMapMaterial.tex = mgrTex.getTex();
+            lightMapMaterial.hasAlpha = mgrTex.getHasAlpha();
         } else {
             lightMapMaterial.tex = GL46C.glGenTextures();
             GL46C.glBindTexture(GL46C.GL_TEXTURE_2D, lightMapMaterial.tex);
