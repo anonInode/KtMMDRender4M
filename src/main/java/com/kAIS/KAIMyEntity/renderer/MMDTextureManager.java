@@ -13,7 +13,7 @@ public class MMDTextureManager {
     static Map<String, Texture> textures;
 
     public static void Init() {
-        nf = NativeFunc.GetInst();
+        nf = NativeFunc.INSTANCE;
         textures = new HashMap<>();
         KAIMyEntityClient.logger.info("MMDTextureManager.Init() finished");
     }

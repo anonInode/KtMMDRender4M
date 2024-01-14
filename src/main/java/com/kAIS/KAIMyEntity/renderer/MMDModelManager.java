@@ -63,7 +63,7 @@ public class MMDModelManager {
     }
 
     public static void AddModel(String Name, IMMDModel model, String modelName) {
-        NativeFunc nf = NativeFunc.GetInst();
+        NativeFunc nf = NativeFunc.INSTANCE;
         EntityData ed = new EntityData();
         ed.stateLayers = new EntityData.EntityState[3];
         ed.playCustomAnim = false;

@@ -72,7 +72,7 @@ public class MMDModelOpenGL implements IMMDModel {
     }
 
     public static MMDModelOpenGL Create(String modelFilename, String modelDir, boolean isPMD, long layerCount) {
-        if (nf == null) nf = NativeFunc.GetInst();
+        if (nf == null) nf = NativeFunc.INSTANCE;
         long model;
         if (isPMD)
             model = nf.LoadModelPMD(modelFilename, modelDir, layerCount);

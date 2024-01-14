@@ -188,7 +188,7 @@ public abstract class KAIMyEntityPlayerRendererMixin extends LivingEntityRendere
                 RenderSystem.setShader(GameRenderer::getRenderTypeEntityTranslucentProgram);
                 model.Render(entityIn, bodyYaw, bodyPitch, entityTrans, matrixStackIn, packedLightIn);
             }
-            NativeFunc nf = NativeFunc.GetInst();
+            NativeFunc nf = NativeFunc.INSTANCE;
             float rotationDegree = 0.0f;
             nf.GetRightHandMat(model.GetModelLong(), mwed.entityData.rightHandMat);
             matrixStackIn.push();

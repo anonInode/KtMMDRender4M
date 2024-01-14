@@ -16,7 +16,7 @@ public class MMDAnimManager {
     static String defaultAnimDir = new File(MinecraftClient.getInstance().runDirectory, "KAIMyEntity/DefaultAnim").getAbsolutePath();
 
     public static void Init() {
-        nf = NativeFunc.GetInst();
+        nf = NativeFunc.INSTANCE;
         animStatic = new HashMap<>();
         animModel = new HashMap<>();
         KAIMyEntityClient.logger.info("MMDAnimManager.Init() finished");

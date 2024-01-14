@@ -1,207 +1,191 @@
-package com.kAIS.KAIMyEntity;
+package com.kAIS.KAIMyEntity
 
-import net.minecraft.client.MinecraftClient;
-import org.apache.commons.io.FileUtils;
+import net.minecraft.client.MinecraftClient
+import org.apache.commons.io.FileUtils
+import java.io.File
+import java.io.IOException
+import java.net.URL
+import java.nio.ByteBuffer
+import java.util.*
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
+private enum class ExternalLib {
+    windows, android_arch64, android_arch64_libc
+}
 
-public class NativeFunc {
-    private static final String RuntimePath = new File(System.getProperty("java.home")).getParent();
-    private static final String gameDirectory = MinecraftClient.getInstance().runDirectory.getAbsolutePath();
-    private static final boolean isAndroid = new File("/system/build.prop").exists();
-    private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
-    private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-    private static final HashMap<runtimeUrlRes, String> urlMap = new HashMap<runtimeUrlRes, String>() {
-        {
-            put(runtimeUrlRes.windows, "https://github.com/Gengorou-C/KAIMyEntitySaba/releases/download/20221215/KAIMyEntitySaba.dll");
-            put(runtimeUrlRes.android_arch64, "https://github.com.cnpmjs.org/asuka-mio/KAIMyEntitySaba/releases/download/crossplatform/KAIMyEntitySaba.so");
-            put(runtimeUrlRes.android_arch64_libc, "https://github.com.cnpmjs.org/asuka-mio/KAIMyEntitySaba/releases/download/crossplatform/libc++_shared.so");
-        }
-    };
-    static NativeFunc inst;
+private val RuntimePath: String = File(System.getProperty("java.home")).parent
+private val gameDirectory: String = MinecraftClient.getInstance().runDirectory.absolutePath
+private val isAndroid = File("/system/build.prop").exists()
+private val isLinux = System.getProperty("os.name").lowercase(Locale.getDefault()).contains("linux")
+private val isWindows = System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")
 
-    public static NativeFunc GetInst() {
-        if (inst == null) {
-            inst = new NativeFunc();
-            inst.Init();
-        }
-        return inst;
-    }
+private const val WIN_DLL =
+    "https://github.com/Gengorou-C/KAIMyEntitySaba/releases/download/20221215/KAIMyEntitySaba.dll"
+private const val ANDROID_SO =
+    "https://github.com.cnpmjs.org/asuka-mio/KAIMyEntitySaba/releases/download/crossplatform/KAIMyEntitySaba.so"
+private const val ANDROID_LIBCXX =
+    "https://github.com.cnpmjs.org/asuka-mio/KAIMyEntitySaba/releases/download/crossplatform/libc++_shared.so"
+private val urlMap = buildMap {
+    put(ExternalLib.windows, WIN_DLL)
+    put(ExternalLib.android_arch64, ANDROID_SO)
+    put(ExternalLib.android_arch64_libc, ANDROID_LIBCXX)
+}
 
-    private void DownloadSingleFile(URL url, File file) throws IOException {
-        if (file.exists()) {
-            try {
-                System.load(file.getAbsolutePath());
-                return; //File exist and loadable
-            } catch (Error e) {
-                KAIMyEntityClient.logger.info("\"" + file.getAbsolutePath() + "\" broken! Trying recover it!");
-            }
-        }
+private fun download(url: URL, file: File) {
+    if (file.exists()) {
         try {
-            file.delete();
-            file.createNewFile();
-            FileUtils.copyURLToFile(url, file, 30000, 30000);
-            System.load(file.getAbsolutePath());
-        } catch (IOException e) {
-            file.delete();
-            KAIMyEntityClient.logger.info("Download \"" + url.getPath() + "\" failed!");
-            KAIMyEntityClient.logger.info("Cannot download runtime!");
-            KAIMyEntityClient.logger.info("Check you internet connection and restart game!");
-            e.printStackTrace();
-            throw e;
+            System.load(file.absolutePath)
+            return  //File exist and loadable
+        } catch (e: Error) {
+            KAIMyEntityClient.logger.info("\"" + file.absolutePath + "\" broken! Trying recover it!")
         }
     }
-
-    private void DownloadRuntime() throws Exception {
-        if (isWindows) {
-            DownloadSingleFile(new URL(urlMap.get(runtimeUrlRes.windows)), new File(gameDirectory, "KAIMyEntitySaba.dll"));
-        }
-        if (isLinux && !isAndroid) {
-            KAIMyEntityClient.logger.info("Not support!");
-            throw new Error();
-        }
-        if (isLinux && isAndroid) {
-            DownloadSingleFile(new URL(urlMap.get(runtimeUrlRes.android_arch64_libc)), new File(RuntimePath, "libc++_shared.so"));
-            DownloadSingleFile(new URL(urlMap.get(runtimeUrlRes.android_arch64)), new File(RuntimePath, "KAIMyEntitySaba.so"));
-        }
+    try {
+        file.delete()
+        file.createNewFile()
+        FileUtils.copyURLToFile(url, file, 30000, 30000)
+        System.load(file.absolutePath)
+    } catch (e: IOException) {
+        file.delete()
+        KAIMyEntityClient.logger.info("Download \"" + url.path + "\" failed!")
+        KAIMyEntityClient.logger.info("Cannot download runtime!")
+        KAIMyEntityClient.logger.info("Check you internet connection and restart game!")
+        e.printStackTrace()
+        throw e
     }
+}
 
-    private void LoadLibrary(File file) {
+object NativeFunc {
+    private fun LoadLibrary(file: File) {
         try {
-            System.load(file.getAbsolutePath());
-        } catch (Error e) {
-            KAIMyEntityClient.logger.info("Runtime \"" + file.getAbsolutePath() + "\" not found, try download from github!");
-            throw e;
+            System.load(file.absolutePath)
+        } catch (e: Error) {
+            KAIMyEntityClient.logger.info("Runtime \"" + file.absolutePath + "\" not found!")
+            throw e
         }
     }
 
-    private void Init() {
-        try {
-            if (isWindows) {
-                KAIMyEntityClient.logger.info("Win32 Env Detected!");
-                LoadLibrary(new File(gameDirectory, "KAIMyEntitySaba.dll"));//WIN32
+    init {
+        when {
+            isWindows -> runCatching {
+                KAIMyEntityClient.logger.info("Win32 Env Detected!")
+                LoadLibrary(File(gameDirectory, "KAIMyEntitySaba.dll"))
+            }.onFailure {
+                download(URL(WIN_DLL), File(gameDirectory, "KAIMyEntitySaba.dll"))
             }
-            if (isLinux && !isAndroid) {
-                KAIMyEntityClient.logger.info("Linux Env Detected!");
-                LoadLibrary(new File(gameDirectory, "KAIMyEntitySaba.so"));//Linux
+
+            isLinux && !isAndroid -> {
+                KAIMyEntityClient.logger.info("Linux Env Detected!")
+                LoadLibrary(File(gameDirectory, "KAIMyEntitySaba.so"))
             }
-            if (isLinux && isAndroid) {
-                KAIMyEntityClient.logger.info("Android Env Detected!");
-                LoadLibrary(new File(RuntimePath, "libc++_shared.so"));
-                LoadLibrary(new File(RuntimePath, "KAIMyEntitySaba.so"));//Android
+
+            isLinux && isAndroid -> runCatching {
+                KAIMyEntityClient.logger.info("Android Env Detected!")
+                LoadLibrary(File(RuntimePath, "libc++_shared.so"))
+                LoadLibrary(File(RuntimePath, "KAIMyEntitySaba.so"))
+            }.onFailure {
+                download(URL(ANDROID_LIBCXX), File(RuntimePath, "libc++_shared.so"))
+                download(URL(ANDROID_SO), File(RuntimePath, "KAIMyEntitySaba.so"))
             }
-        } catch (Error e) {
-            try {
-                DownloadRuntime();
-            } catch (Exception ex) {
-                throw e;
-            }
+
+            else -> error("Unsupported OS!!!")
         }
     }
 
-    public native String GetVersion();
+    external fun GetVersion(): String?
 
-    public native byte ReadByte(long data, long pos);
+    external fun ReadByte(data: Long, pos: Long): Byte
 
-    public native void CopyDataToByteBuffer(ByteBuffer buffer, long data, long pos);
+    external fun CopyDataToByteBuffer(buffer: ByteBuffer?, data: Long, pos: Long)
 
-    public native long LoadModelPMX(String filename, String dir, long layerCount);
+    external fun LoadModelPMX(filename: String?, dir: String?, layerCount: Long): Long
 
-    public native long LoadModelPMD(String filename, String dir, long layerCount);
+    external fun LoadModelPMD(filename: String?, dir: String?, layerCount: Long): Long
 
-    public native void DeleteModel(long model);
+    external fun DeleteModel(model: Long)
 
-    public native void UpdateModel(long model);
+    external fun UpdateModel(model: Long)
 
-    public native long GetVertexCount(long model);
+    external fun GetVertexCount(model: Long): Long
 
-    public native long GetPoss(long model);
+    external fun GetPoss(model: Long): Long
 
-    public native long GetNormals(long model);
+    external fun GetNormals(model: Long): Long
 
-    public native long GetUVs(long model);
+    external fun GetUVs(model: Long): Long
 
-    public native long GetIndexElementSize(long model);
+    external fun GetIndexElementSize(model: Long): Long
 
-    public native long GetIndexCount(long model);
+    external fun GetIndexCount(model: Long): Long
 
-    public native long GetIndices(long model);
+    external fun GetIndices(model: Long): Long
 
-    public native long GetMaterialCount(long model);
+    external fun GetMaterialCount(model: Long): Long
 
-    public native String GetMaterialTex(long model, long pos);
+    external fun GetMaterialTex(model: Long, pos: Long): String?
 
-    public native String GetMaterialSpTex(long model, long pos);
+    external fun GetMaterialSpTex(model: Long, pos: Long): String?
 
-    public native String GetMaterialToonTex(long model, long pos);
+    external fun GetMaterialToonTex(model: Long, pos: Long): String?
 
-    public native long GetMaterialAmbient(long model, long pos);
+    external fun GetMaterialAmbient(model: Long, pos: Long): Long
 
-    public native long GetMaterialDiffuse(long model, long pos);
+    external fun GetMaterialDiffuse(model: Long, pos: Long): Long
 
-    public native long GetMaterialSpecular(long model, long pos);
+    external fun GetMaterialSpecular(model: Long, pos: Long): Long
 
-    public native float GetMaterialSpecularPower(long model, long pos);
+    external fun GetMaterialSpecularPower(model: Long, pos: Long): Float
 
-    public native float GetMaterialAlpha(long model, long pos);
+    external fun GetMaterialAlpha(model: Long, pos: Long): Float
 
-    public native long GetMaterialTextureMulFactor(long model, long pos);
+    external fun GetMaterialTextureMulFactor(model: Long, pos: Long): Long
 
-    public native long GetMaterialTextureAddFactor(long model, long pos);
+    external fun GetMaterialTextureAddFactor(model: Long, pos: Long): Long
 
-    public native int GetMaterialSpTextureMode(long model, long pos);
+    external fun GetMaterialSpTextureMode(model: Long, pos: Long): Int
 
-    public native long GetMaterialSpTextureMulFactor(long model, long pos);
+    external fun GetMaterialSpTextureMulFactor(model: Long, pos: Long): Long
 
-    public native long GetMaterialSpTextureAddFactor(long model, long pos);
+    external fun GetMaterialSpTextureAddFactor(model: Long, pos: Long): Long
 
-    public native long GetMaterialToonTextureMulFactor(long model, long pos);
+    external fun GetMaterialToonTextureMulFactor(model: Long, pos: Long): Long
 
-    public native long GetMaterialToonTextureAddFactor(long model, long pos);
+    external fun GetMaterialToonTextureAddFactor(model: Long, pos: Long): Long
 
-    public native boolean GetMaterialBothFace(long model, long pos);
+    external fun GetMaterialBothFace(model: Long, pos: Long): Boolean
 
-    public native long GetSubMeshCount(long model);
+    external fun GetSubMeshCount(model: Long): Long
 
-    public native int GetSubMeshMaterialID(long model, long pos);
+    external fun GetSubMeshMaterialID(model: Long, pos: Long): Int
 
-    public native int GetSubMeshBeginIndex(long model, long pos);
+    external fun GetSubMeshBeginIndex(model: Long, pos: Long): Int
 
-    public native int GetSubMeshVertexCount(long model, long pos);
+    external fun GetSubMeshVertexCount(model: Long, pos: Long): Int
 
-    public native void ChangeModelAnim(long model, long anim, long layer);
+    external fun ChangeModelAnim(model: Long, anim: Long, layer: Long)
 
-    public native void ResetModelPhysics(long model);
+    external fun ResetModelPhysics(model: Long)
 
-    public native long CreateMat();
+    external fun CreateMat(): Long
 
-    public native void DeleteMat(long mat);
+    external fun DeleteMat(mat: Long)
 
-    public native void GetRightHandMat(long model, long mat);
+    external fun GetRightHandMat(model: Long, mat: Long)
 
-    public native void GetLeftHandMat(long model, long mat);
+    external fun GetLeftHandMat(model: Long, mat: Long)
 
-    public native long LoadTexture(String filename);
+    external fun LoadTexture(filename: String?): Long
 
-    public native void DeleteTexture(long tex);
+    external fun DeleteTexture(tex: Long)
 
-    public native int GetTextureX(long tex);
+    external fun GetTextureX(tex: Long): Int
 
-    public native int GetTextureY(long tex);
+    external fun GetTextureY(tex: Long): Int
 
-    public native long GetTextureData(long tex);
+    external fun GetTextureData(tex: Long): Long
 
-    public native boolean TextureHasAlpha(long tex);
+    external fun TextureHasAlpha(tex: Long): Boolean
 
-    public native long LoadAnimation(long model, String filename);
+    external fun LoadAnimation(model: Long, filename: String?): Long
 
-    public native void DeleteAnimation(long anim);
-
-    enum runtimeUrlRes {
-        windows, android_arch64, android_arch64_libc
-    }
+    external fun DeleteAnimation(anim: Long)
 }
