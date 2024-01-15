@@ -33,16 +33,16 @@ class MMDModelOpenGL(
     val vertexCount: Int,
     val posBuffer: ByteBuffer,
     val colorBuffer: ByteBuffer,
-    val norBuffer: ByteBuffer,
+    val normalBuffer: ByteBuffer,
     var uv0Buffer: ByteBuffer,
     var uv1Buffer: ByteBuffer,
     var uv2Buffer: ByteBuffer,
     var vertexArrayObject: Int,
     var indexBufferObject: Int,
-    var vertexBufferObject: Int,
+    var vertexBufferObject: GlBuffer,
     var colorBufferObject: Int,
-    var normalBufferObject: Int,
-    var texcoordBufferObject: Int,
+    var normalBufferObject: GlBuffer,
+    var texcoordBufferObject: GlBuffer,
     var uv1BufferObject: Int,
     var uv2BufferObject: Int,
     var indexElementSize: Int,
@@ -142,20 +142,18 @@ class MMDModelOpenGL(
         val posAndNorSize = vertexCount * 12 //float * 3
         val posData = NativeFunc.GetPoss(model)
         NativeFunc.CopyDataToByteBuffer(posBuffer, posData, posAndNorSize.toLong())
+        vertexBufferObject.bind(BufferTarget.ARRAY) { data(posBuffer) }
         if (positionLocation != -1) {
             GL46C.glEnableVertexAttribArray(positionLocation)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, vertexBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, posBuffer, GL46C.GL_STATIC_DRAW)
             GL46C.glVertexAttribPointer(positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
 
         //Normal
         val normalData = NativeFunc.GetNormals(model)
-        NativeFunc.CopyDataToByteBuffer(norBuffer, normalData, posAndNorSize.toLong())
+        NativeFunc.CopyDataToByteBuffer(normalBuffer, normalData, posAndNorSize.toLong())
+        normalBufferObject.bind(BufferTarget.ARRAY) { data(normalBuffer) }
         if (normalLocation != -1) {
             GL46C.glEnableVertexAttribArray(normalLocation)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, normalBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, norBuffer, GL46C.GL_STATIC_DRAW)
             GL46C.glVertexAttribPointer(normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
 
@@ -163,10 +161,9 @@ class MMDModelOpenGL(
         val uv0Size = vertexCount * 8 //float * 2
         val uv0Data = NativeFunc.GetUVs(model)
         NativeFunc.CopyDataToByteBuffer(uv0Buffer, uv0Data, uv0Size.toLong())
+        texcoordBufferObject.bind(BufferTarget.ARRAY) { data(uv0Buffer) }
         if (uv0Location != -1) {
             GL46C.glEnableVertexAttribArray(uv0Location)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, texcoordBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv0Buffer, GL46C.GL_STATIC_DRAW)
             GL46C.glVertexAttribPointer(uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0)
         }
 
@@ -221,20 +218,14 @@ class MMDModelOpenGL(
         //Iris
         if (I_positionLocation != -1) {
             GL46C.glEnableVertexAttribArray(I_positionLocation)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, vertexBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, posBuffer, GL46C.GL_STATIC_DRAW)
             GL46C.glVertexAttribPointer(I_positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
         if (I_normalLocation != -1) {
             GL46C.glEnableVertexAttribArray(I_normalLocation)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, normalBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, norBuffer, GL46C.GL_STATIC_DRAW)
             GL46C.glVertexAttribPointer(I_normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
         if (I_uv0Location != -1) {
             GL46C.glEnableVertexAttribArray(I_uv0Location)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, texcoordBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv0Buffer, GL46C.GL_STATIC_DRAW)
             GL46C.glVertexAttribPointer(I_uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0)
         }
         if (I_uv2Location != -1) {
@@ -339,10 +330,10 @@ class MMDModelOpenGL(
             //Model exists,now we prepare data for OpenGL
             val vertexArrayObject = GL46C.glGenVertexArrays()
             val ibo = GlBuffer.gen()
-            val positionBufferObject = GL46C.glGenBuffers()
+            val positionBufferObject = GlBuffer.gen()
             val colorBufferObject = GL46C.glGenBuffers()
-            val normalBufferObject = GL46C.glGenBuffers()
-            val uv0BufferObject = GL46C.glGenBuffers()
+            val normalBufferObject = GlBuffer.gen()
+            val uv0BufferObject = GlBuffer.gen()
             val uv1BufferObject = GL46C.glGenBuffers()
             val uv2BufferObject = GL46C.glGenBuffers()
 
@@ -430,8 +421,8 @@ class MMDModelOpenGL(
                 model, modelDir, vertexCount, posBuffer,
                 colorBuffer, norBuffer, uv0Buffer, uv1Buffer, uv2Buffer,
                 vertexArrayObject, ibo.name, positionBufferObject, colorBufferObject,
-                uv0BufferObject, uv1BufferObject, uv2BufferObject,
-                normalBufferObject, indexElementSize, indexType,
+                normalBufferObject, uv0BufferObject, uv1BufferObject,
+                uv2BufferObject, indexElementSize, indexType,
                 materials, lightMapMaterial
             )
         }
