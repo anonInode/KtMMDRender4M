@@ -13,17 +13,18 @@ import gln.texture.TexMagFilter
 import gln.texture.TexMinFilter
 import org.lwjgl.opengl.GL46C
 import java.nio.ByteBuffer
+import java.util.Optional
 
-private val textures = mutableMapOf<String, MMDTextureManager.Texture>()
+private val textures = mutableMapOf<String, Optional<MMDTextureManager.Texture>>()
 
 object MMDTextureManager {
-    fun texture(filename: String): Texture {
+    fun texture(filename: String): Optional<Texture> {
         return textures.computeIfAbsent(filename) {
             with(NativeFunc) {
                 val nfTex = LoadTexture(filename)
                 if (nfTex == 0L) {
                     KAIMyEntityClient.logger.info(String.format("Cannot find texture: %s", filename))
-                    return@computeIfAbsent Texture(0, false)
+                    return@computeIfAbsent Optional.empty()
                 }
                 val x = GetTextureX(nfTex)
                 val y = GetTextureY(nfTex)
@@ -46,13 +47,13 @@ object MMDTextureManager {
                     minFilter = TexMinFilter.LINEAR
                     magFilter = TexMagFilter.LINEAR
                 }
-                Texture(tex.name, hasAlpha)
+                Optional.of(Texture(tex.name, hasAlpha))
             }
         }
     }
 
     data class Texture(
-        val tex: Int,
-        val hasAlpha: Boolean,
+        val tex: Int = 0,
+        val hasAlpha: Boolean = false,
     )
 }

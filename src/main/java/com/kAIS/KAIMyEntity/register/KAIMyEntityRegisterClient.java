@@ -16,7 +16,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityType;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
@@ -27,12 +26,11 @@ public class KAIMyEntityRegisterClient {
     static KeyBinding keyResetPhysics = new KeyBinding("key.resetPhysics", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, "key.title");
     static KeyBinding keyReloadModels = new KeyBinding("key.reloadModels", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.title");
     static KeyBinding keyReloadProperties = new KeyBinding("key.reloadProperties", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_J, "key.title");
-    static KeyBinding keyChangeProgram = new KeyBinding("key.changeProgram", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_KP_0, "key.title");
     static KeyBinding keyCustomAnim1 = new KeyBinding("key.customAnim1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.title");
     static KeyBinding keyCustomAnim2 = new KeyBinding("key.customAnim2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.title");
     static KeyBinding keyCustomAnim3 = new KeyBinding("key.customAnim3", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N, "key.title");
     static KeyBinding keyCustomAnim4 = new KeyBinding("key.customAnim4", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_M, "key.title");
-    static KeyBinding[] keyBindings = new KeyBinding[]{keyCustomAnim1, keyCustomAnim2, keyCustomAnim3, keyCustomAnim4, keyReloadModels, keyResetPhysics, keyReloadProperties, keyChangeProgram};
+    static KeyBinding[] keyBindings = new KeyBinding[]{keyCustomAnim1, keyCustomAnim2, keyCustomAnim3, keyCustomAnim4, keyReloadModels, keyResetPhysics, keyReloadProperties};
     static KeyBinding[] customKeyBindings = new KeyBinding[]{keyCustomAnim1, keyCustomAnim2, keyCustomAnim3, keyCustomAnim4};
 
     public static void Register() {
@@ -60,15 +58,6 @@ public class KAIMyEntityRegisterClient {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyReloadProperties.wasPressed()) {
                 KAIMyEntityClient.reloadProperties = true;
-            }
-        });
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (keyChangeProgram.wasPressed()) {
-                KAIMyEntityClient.usingMMDShader = 1 - KAIMyEntityClient.usingMMDShader;
-                if (KAIMyEntityClient.usingMMDShader == 0)
-                    MCinstance.inGameHud.getChatHud().addMessage(Text.of("Default shader"));
-                if (KAIMyEntityClient.usingMMDShader == 1)
-                    MCinstance.inGameHud.getChatHud().addMessage(Text.of("MMDShader"));
             }
         });
 
