@@ -66,17 +66,6 @@ class MMDModelOpenGL(
     var light0Location: Int = 0
     var light1Location: Int = 0
 
-    var K_positionLocation: Int = 0
-    var K_normalLocation: Int = 0
-    var K_uv0Location: Int = 0
-    var K_uv2Location: Int = 0
-    var K_projMatLocation: Int = 0
-    var K_modelViewLocation: Int = 0
-    var K_sampler0Location: Int = 0
-    var K_sampler2Location: Int = 0
-    var KAIMyLocationV: Int = 0
-    var KAIMyLocationF: Int = 0
-
     var I_positionLocation: Int = 0
     var I_normalLocation: Int = 0
     var I_uv0Location: Int = 0
@@ -225,51 +214,6 @@ class MMDModelOpenGL(
         deliverStack.peek().positionMatrix[modelViewMatBuff]
         RenderSystem.getProjectionMatrix()[projMatBuff]
 
-        //custom attributes & custom uniforms
-        if (K_positionLocation != -1) {
-            GL46C.glEnableVertexAttribArray(K_positionLocation)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, vertexBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, posBuffer, GL46C.GL_STATIC_DRAW)
-            GL46C.glVertexAttribPointer(K_positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
-        }
-        if (K_normalLocation != -1) {
-            GL46C.glEnableVertexAttribArray(K_normalLocation)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, normalBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, norBuffer, GL46C.GL_STATIC_DRAW)
-            GL46C.glVertexAttribPointer(K_normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
-        }
-        if (K_uv0Location != -1) {
-            GL46C.glEnableVertexAttribArray(K_uv0Location)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, texcoordBufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv0Buffer, GL46C.GL_STATIC_DRAW)
-            GL46C.glVertexAttribPointer(K_uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0)
-        }
-        if (K_uv2Location != -1) {
-            GL46C.glEnableVertexAttribArray(K_uv2Location)
-            GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, uv2BufferObject)
-            GL46C.glBufferData(GL46C.GL_ARRAY_BUFFER, uv2Buffer, GL46C.GL_STATIC_DRAW)
-            GL46C.glVertexAttribIPointer(K_uv2Location, 2, GL46C.GL_INT, 0, 0)
-        }
-        if (K_projMatLocation != -1) {
-            projMatBuff.position(0)
-            RenderSystem.glUniformMatrix4(K_projMatLocation, false, projMatBuff)
-        }
-        if (K_modelViewLocation != -1) {
-            modelViewMatBuff.position(0)
-            RenderSystem.glUniformMatrix4(K_modelViewLocation, false, modelViewMatBuff)
-        }
-        if (K_sampler0Location != -1) {
-            GL46C.glUniform1i(K_sampler0Location, 0)
-        }
-        if (K_sampler2Location != -1) {
-            RenderSystem.activeTexture(GL46C.GL_TEXTURE2)
-            RenderSystem.bindTexture(lightMapMaterial.tex)
-            GL46C.glUniform1i(K_sampler2Location, 2)
-        }
-        if (KAIMyLocationV != -1) GL46C.glUniform1i(KAIMyLocationV, 1)
-
-        if (KAIMyLocationF != -1) GL46C.glUniform1i(KAIMyLocationF, 1)
-
         //Iris
         if (I_positionLocation != -1) {
             GL46C.glEnableVertexAttribArray(I_positionLocation)
@@ -324,9 +268,6 @@ class MMDModelOpenGL(
             GL46C.glDrawElements(GL46C.GL_TRIANGLES, count, indexType, startPos)
         }
 
-        if (KAIMyLocationV != -1) GL46C.glUniform1i(KAIMyLocationV, 0)
-        if (KAIMyLocationF != -1) GL46C.glUniform1i(KAIMyLocationF, 0)
-
         RenderSystem.getShader()!!.unbind()
         BufferRenderer.reset()
     }
@@ -345,17 +286,6 @@ class MMDModelOpenGL(
         sampler2Location = GlStateManager._glGetUniformLocation(shaderProgram, "Sampler2")
         light0Location = GlStateManager._glGetUniformLocation(shaderProgram, "Light0_Direction")
         light1Location = GlStateManager._glGetUniformLocation(shaderProgram, "Light1_Direction")
-
-        K_positionLocation = GlStateManager._glGetAttribLocation(shaderProgram, "K_Position")
-        K_normalLocation = GlStateManager._glGetAttribLocation(shaderProgram, "K_Normal")
-        K_uv0Location = GlStateManager._glGetAttribLocation(shaderProgram, "K_UV0")
-        K_uv2Location = GlStateManager._glGetAttribLocation(shaderProgram, "K_UV2")
-        K_projMatLocation = GlStateManager._glGetUniformLocation(shaderProgram, "K_ProjMat")
-        K_modelViewLocation = GlStateManager._glGetUniformLocation(shaderProgram, "K_ModelViewMat")
-        K_sampler0Location = GlStateManager._glGetUniformLocation(shaderProgram, "K_Sampler0")
-        K_sampler2Location = GlStateManager._glGetUniformLocation(shaderProgram, "K_Sampler2")
-        KAIMyLocationV = GlStateManager._glGetUniformLocation(shaderProgram, "KAIMyEntityV")
-        KAIMyLocationF = GlStateManager._glGetUniformLocation(shaderProgram, "KAIMyEntityF")
 
         I_positionLocation = GlStateManager._glGetAttribLocation(shaderProgram, "iris_Position")
         I_normalLocation = GlStateManager._glGetAttribLocation(shaderProgram, "iris_Normal")
