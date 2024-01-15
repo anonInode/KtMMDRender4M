@@ -57,13 +57,6 @@ class MMDModelOpenGL(
     var uv1Location: Int = 0
     var uv2Location: Int = 0
     var colorLocation: Int = 0
-    var projMatLocation: Int = 0
-    var modelViewLocation: Int = 0
-    var sampler0Location: Int = 0
-    var sampler1Location: Int = 0
-    var sampler2Location: Int = 0
-    var light0Location: Int = 0
-    var light1Location: Int = 0
 
     var I_positionLocation: Int = 0
     var I_normalLocation: Int = 0
@@ -270,13 +263,6 @@ class MMDModelOpenGL(
         uv1Location = GlStateManager._glGetAttribLocation(shaderProgram, "UV1")
         uv2Location = GlStateManager._glGetAttribLocation(shaderProgram, "UV2")
         colorLocation = GlStateManager._glGetAttribLocation(shaderProgram, "Color")
-        projMatLocation = GlStateManager._glGetUniformLocation(shaderProgram, "ProjMat")
-        modelViewLocation = GlStateManager._glGetUniformLocation(shaderProgram, "ModelViewMat")
-        sampler0Location = GlStateManager._glGetUniformLocation(shaderProgram, "Sampler0")
-        sampler1Location = GlStateManager._glGetUniformLocation(shaderProgram, "Sampler1")
-        sampler2Location = GlStateManager._glGetUniformLocation(shaderProgram, "Sampler2")
-        light0Location = GlStateManager._glGetUniformLocation(shaderProgram, "Light0_Direction")
-        light1Location = GlStateManager._glGetUniformLocation(shaderProgram, "Light1_Direction")
 
         I_positionLocation = GlStateManager._glGetAttribLocation(shaderProgram, "iris_Position")
         I_normalLocation = GlStateManager._glGetAttribLocation(shaderProgram, "iris_Normal")
