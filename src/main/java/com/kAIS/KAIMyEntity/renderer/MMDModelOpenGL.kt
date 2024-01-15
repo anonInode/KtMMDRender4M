@@ -42,7 +42,7 @@ class MMDModelOpenGL(
     var vertexBufferObject: GlBuffer,
     var colorBufferObject: Int,
     var normalBufferObject: GlBuffer,
-    var texcoordBufferObject: GlBuffer,
+    var uv0BufferObject: GlBuffer,
     var uv1BufferObject: Int,
     var uv2BufferObject: Int,
     var indexElementSize: Int,
@@ -143,28 +143,43 @@ class MMDModelOpenGL(
         val posData = NativeFunc.GetPoss(model)
         NativeFunc.CopyDataToByteBuffer(posBuffer, posData, posAndNorSize.toLong())
         vertexBufferObject.bind(BufferTarget.ARRAY) { data(posBuffer) }
-        if (positionLocation != -1) {
-            GL46C.glEnableVertexAttribArray(positionLocation)
-            GL46C.glVertexAttribPointer(positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
+        val posLoc = when {
+            positionLocation != -1 -> positionLocation
+            I_positionLocation != -1 -> I_positionLocation
+            else -> null
+        }
+        if (posLoc != null) {
+            GL46C.glEnableVertexAttribArray(posLoc)
+            GL46C.glVertexAttribPointer(posLoc, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
 
         //Normal
         val normalData = NativeFunc.GetNormals(model)
         NativeFunc.CopyDataToByteBuffer(normalBuffer, normalData, posAndNorSize.toLong())
         normalBufferObject.bind(BufferTarget.ARRAY) { data(normalBuffer) }
-        if (normalLocation != -1) {
-            GL46C.glEnableVertexAttribArray(normalLocation)
-            GL46C.glVertexAttribPointer(normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
+        val normalLoc = when {
+            normalLocation != -1 -> normalLocation
+            I_normalLocation != -1 -> I_normalLocation
+            else -> null
+        }
+        if (normalLoc != null) {
+            GL46C.glEnableVertexAttribArray(normalLoc)
+            GL46C.glVertexAttribPointer(normalLoc, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
 
         //UV0
         val uv0Size = vertexCount * 8 //float * 2
         val uv0Data = NativeFunc.GetUVs(model)
         NativeFunc.CopyDataToByteBuffer(uv0Buffer, uv0Data, uv0Size.toLong())
-        texcoordBufferObject.bind(BufferTarget.ARRAY) { data(uv0Buffer) }
-        if (uv0Location != -1) {
-            GL46C.glEnableVertexAttribArray(uv0Location)
-            GL46C.glVertexAttribPointer(uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0)
+        uv0BufferObject.bind(BufferTarget.ARRAY) { data(uv0Buffer) }
+        val uv0Loc = when {
+            uv0Location != -1 -> uv0Location
+            I_uv0Location != -1 -> I_uv0Location
+            else -> null
+        }
+        if (uv0Loc != null) {
+            GL46C.glEnableVertexAttribArray(uv0Loc)
+            GL46C.glVertexAttribPointer(uv0Loc, 2, GL46C.GL_FLOAT, false, 0, 0)
         }
 
         //UV2
@@ -216,18 +231,6 @@ class MMDModelOpenGL(
         RenderSystem.getProjectionMatrix()[projMatBuff]
 
         //Iris
-        if (I_positionLocation != -1) {
-            GL46C.glEnableVertexAttribArray(I_positionLocation)
-            GL46C.glVertexAttribPointer(I_positionLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
-        }
-        if (I_normalLocation != -1) {
-            GL46C.glEnableVertexAttribArray(I_normalLocation)
-            GL46C.glVertexAttribPointer(I_normalLocation, 3, GL46C.GL_FLOAT, false, 0, 0)
-        }
-        if (I_uv0Location != -1) {
-            GL46C.glEnableVertexAttribArray(I_uv0Location)
-            GL46C.glVertexAttribPointer(I_uv0Location, 2, GL46C.GL_FLOAT, false, 0, 0)
-        }
         if (I_uv2Location != -1) {
             GL46C.glEnableVertexAttribArray(I_uv2Location)
             GL46C.glBindBuffer(GL46C.GL_ARRAY_BUFFER, uv2BufferObject)
