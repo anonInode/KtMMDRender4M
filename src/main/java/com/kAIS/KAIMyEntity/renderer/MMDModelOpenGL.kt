@@ -23,7 +23,6 @@ import net.minecraft.world.LightType
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.lwjgl.opengl.GL46C
-import org.lwjgl.system.MemoryUtil
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -75,9 +74,6 @@ class MMDModelOpenGL(
     val light0Direction = Vector3f()
     val light1Direction = Vector3f()
     val q = Quaternionf()
-
-    val modelViewMatBuff = MemoryUtil.memAllocFloat(16)
-    val projMatBuff = MemoryUtil.memAllocFloat(16)
 
     override fun Render(
         entityIn: Entity,
@@ -226,9 +222,6 @@ class MMDModelOpenGL(
         }
 
         GL46C.glBindBuffer(GL46C.GL_ELEMENT_ARRAY_BUFFER, indexBufferObject)
-
-        deliverStack.peek().positionMatrix[modelViewMatBuff]
-        RenderSystem.getProjectionMatrix()[projMatBuff]
 
         //Iris
         if (I_uv2Location != -1) {
