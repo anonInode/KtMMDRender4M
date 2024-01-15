@@ -138,8 +138,8 @@ class MMDModelOpenGL(
         RenderSystem.blendEquation(GL46C.GL_FUNC_ADD)
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA)
 
-        //Position
-        val posAndNorSize = vertexCount * 12 //float * 3
+        // Position
+        val posAndNorSize = vertexCount * 12 // float * 3
         val posData = NativeFunc.GetPoss(model)
         NativeFunc.CopyDataToByteBuffer(posBuffer, posData, posAndNorSize.toLong())
         vertexBufferObject.bind(BufferTarget.ARRAY) { data(posBuffer) }
@@ -153,7 +153,7 @@ class MMDModelOpenGL(
             GL46C.glVertexAttribPointer(posLoc, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
 
-        //Normal
+        // Normal
         val normalData = NativeFunc.GetNormals(model)
         NativeFunc.CopyDataToByteBuffer(normalBuffer, normalData, posAndNorSize.toLong())
         normalBufferObject.bind(BufferTarget.ARRAY) { data(normalBuffer) }
@@ -167,7 +167,7 @@ class MMDModelOpenGL(
             GL46C.glVertexAttribPointer(normalLoc, 3, GL46C.GL_FLOAT, false, 0, 0)
         }
 
-        //UV0
+        // UV0
         val uv0Size = vertexCount * 8 //float * 2
         val uv0Data = NativeFunc.GetUVs(model)
         NativeFunc.CopyDataToByteBuffer(uv0Buffer, uv0Data, uv0Size.toLong())
