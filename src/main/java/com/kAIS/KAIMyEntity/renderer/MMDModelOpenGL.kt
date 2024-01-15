@@ -76,6 +76,9 @@ class MMDModelOpenGL(
     val light1Direction = Vector3f()
     val q = Quaternionf()
 
+    val modelViewMatBuff = MemoryUtil.memAllocFloat(16)
+    val projMatBuff = MemoryUtil.memAllocFloat(16)
+
     override fun Render(
         entityIn: Entity,
         entityYaw: Float,
@@ -212,8 +215,6 @@ class MMDModelOpenGL(
 
         GL46C.glBindBuffer(GL46C.GL_ELEMENT_ARRAY_BUFFER, indexBufferObject)
 
-        val modelViewMatBuff = MemoryUtil.memAllocFloat(16)
-        val projMatBuff = MemoryUtil.memAllocFloat(16)
         deliverStack.peek().positionMatrix[modelViewMatBuff]
         RenderSystem.getProjectionMatrix()[projMatBuff]
 
