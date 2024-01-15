@@ -72,8 +72,9 @@ class MMDModelOpenGL(
     var I_uv2Location: Int = 0
     var I_colorLocation: Int = 0
 
-    var light0Direction: Vector3f? = null
-    var light1Direction: Vector3f? = null
+    val light0Direction = Vector3f()
+    val light1Direction = Vector3f()
+    val q = Quaternionf()
 
     override fun Render(
         entityIn: Entity,
@@ -107,12 +108,14 @@ class MMDModelOpenGL(
         deliverStack: MatrixStack
     ) {
         val MCinstance = MinecraftClient.getInstance()
-        light0Direction = Vector3f(1.0f, 0.75f, 0.0f)
-        light1Direction = Vector3f(-1.0f, 0.75f, 0.0f)
-        light0Direction!!.normalize()
-        light1Direction!!.normalize()
-        light0Direction!!.rotate(Quaternionf().rotateY(entityYaw * (Math.PI.toFloat() / 180f)))
-        light1Direction!!.rotate(Quaternionf().rotateY(entityYaw * (Math.PI.toFloat() / 180f)))
+        light0Direction.set(1.0f, 0.75f, 0.0f)
+        light1Direction.set(-1.0f, 0.75f, 0.0f)
+        light0Direction.normalize()
+        light1Direction.normalize()
+        q.set(0f, 0f, 0f, 1f)
+        q.rotateY(entityYaw * (Math.PI.toFloat() / 180f))
+        light0Direction.rotate(q)
+        light1Direction.rotate(q)
 
         deliverStack.multiply(Quaternionf().rotateY(-entityYaw * (Math.PI.toFloat() / 180f)))
         deliverStack.multiply(Quaternionf().rotateX(entityPitch * (Math.PI.toFloat() / 180f)))
